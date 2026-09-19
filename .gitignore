@@ -1,0 +1,4 @@
+assets-source/
+.claude/
+.DS_Store
+*.bak
