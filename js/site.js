@@ -305,6 +305,68 @@
     } else { start(); }
   }
 
+  /* ---------- carte de la zone ---------- */
+  var zsvg = document.getElementById('zmapSvg'),
+      ztip = document.getElementById('zmapTip'),
+      zlist = document.getElementById('villes');
+
+  if (zsvg && zlist) {
+    var zpaths = {};
+    Array.prototype.forEach.call(zsvg.querySelectorAll('.z'), function (p) {
+      zpaths[p.id.replace(/^z-/, '')] = p;
+    });
+    var zlis = {};
+    Array.prototype.forEach.call(zlist.querySelectorAll('li[data-z]'), function (li) {
+      zlis[li.dataset.z] = li;
+    });
+
+    var actif = null;
+    function surligne(slug, e) {
+      if (actif === slug) { if (e) place(e); return; }
+      eteins();
+      actif = slug;
+      if (zpaths[slug]) zpaths[slug].classList.add('on');
+      if (zlis[slug]) zlis[slug].classList.add('on');
+      if (zpaths[slug] && ztip) {
+        ztip.textContent = zpaths[slug].dataset.nom;
+        ztip.classList.add('on');
+        place(e);
+      }
+    }
+    function eteins() {
+      if (!actif) return;
+      if (zpaths[actif]) zpaths[actif].classList.remove('on');
+      if (zlis[actif]) zlis[actif].classList.remove('on');
+      actif = null;
+      if (ztip) ztip.classList.remove('on');
+    }
+    function place(e) {
+      if (!ztip) return;
+      var box = zsvg.parentNode.getBoundingClientRect(), x, y;
+      if (e && e.clientX !== undefined) { x = e.clientX - box.left; y = e.clientY - box.top; }
+      else if (actif && zpaths[actif]) {
+        var r = zpaths[actif].getBoundingClientRect();
+        x = r.left + r.width / 2 - box.left; y = r.top + r.height / 2 - box.top;
+      } else return;
+      ztip.style.left = Math.max(8, Math.min(box.width - 8, x)) + 'px';
+      ztip.style.top = y + 'px';
+    }
+
+    Array.prototype.forEach.call(zsvg.querySelectorAll('.z'), function (p) {
+      var slug = p.id.replace(/^z-/, '');
+      p.addEventListener('pointerenter', function (e) { surligne(slug, e); });
+      p.addEventListener('pointermove', function (e) { if (actif === slug) place(e); });
+      p.addEventListener('pointerleave', eteins);
+    });
+    zsvg.addEventListener('pointerleave', eteins);
+
+    Object.keys(zlis).forEach(function (slug) {
+      var li = zlis[slug];
+      li.addEventListener('pointerenter', function () { surligne(slug, null); });
+      li.addEventListener('pointerleave', eteins);
+    });
+  }
+
   /* ---------- formulaire ---------- */
   var form = document.getElementById('devis');
   if (form) {

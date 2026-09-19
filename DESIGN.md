@@ -109,6 +109,32 @@ sur fond clair.
 
 ---
 
+## 3 quater. Zone : carte SVG des vraies communes
+
+Pas de Google Maps, pas de tuiles OpenStreetMap, aucun script tiers. La carte est un SVG
+inline de 32 Ko construit à partir des contours officiels des communes, récupérés sur
+`geo.api.gouv.fr` (base Admin Express de l'IGN). Raisons du choix :
+
+- **Cohérence.** Une carte tierce arrive avec sa palette et son typographie, et casse la DA
+  en un bloc. Ici le fond, les traits et le rouge sortent des mêmes tokens que le reste.
+- **Vie privée.** La politique de confidentialité annonce zéro cookie et zéro traceur.
+  Un iframe Google Maps déposerait les deux et rendrait cette phrase fausse.
+- **Vitesse.** Aucune requête réseau, aucun chargement de tuiles, rien à attendre.
+
+Construction : projection équirectangulaire recentrée sur Linas avec correction en
+`cos(latitude)`, simplification Douglas-Peucker (ε = 1,15 px pour les 22 communes
+desservies, 3,4 px pour les 94 communes de contexte), cadrage sur la bounding box de la
+zone plus une marge. Les cercles pointillés à 5, 10 et 15 km sont tracés à l'échelle
+réelle (42 px par km).
+
+Lecture : le contexte en `#0F1419` presque éteint, les communes desservies en `#2B343E`
+avec un trait `#5C6873`, Linas en rouge de marque avec un halo radial et un marqueur qui
+pulse. Survoler une commune sur la carte surligne son nom dans la liste, et l'inverse
+fonctionne aussi : la liste texte reste la source d'information, la carte l'illustre.
+Sous 700 px les étiquettes disparaissent, la liste prend le relais.
+
+---
+
 ## 4. Layout
 
 Page unique, mobile d'abord, contenu à 1180 px max, gouttières 20 px / 32 px.
