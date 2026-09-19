@@ -1,7 +1,11 @@
 # VR Couverture — site vitrine
 
-Site statique une page. Aucune dépendance, aucun build. Se déploie tel quel sur
-GitHub Pages, Netlify ou un hébergement mutualisé.
+**En ligne : https://znk-v.github.io/vr-couverture/**
+
+Site statique une page. Aucune dépendance, aucun build. Publié par GitHub Pages
+depuis la branche `main` ; tout `git push` met le site à jour en une minute.
+Les chemins sont relatifs, donc le site fonctionne aussi bien sous
+`/vr-couverture/` qu'à la racine d'un domaine.
 
 ## Aperçu local
 
@@ -22,16 +26,30 @@ Cinq valeurs sont des marqueurs et doivent être remplacées. Elles apparaissent
 |----------|------|
 | Téléphone `07 59 51 87 26` / `tel:+33759518726` | ✅ en place |
 | `contact@vr-couverture.fr` | ❌ à remplacer par la vraie adresse (elle reçoit les demandes du formulaire) |
-| `vr-couverture.fr` | ❌ à remplacer par le vrai nom de domaine |
+| `znk-v.github.io/vr-couverture` | ⚠️ URL provisoire dans canonical, Open Graph, sitemap et JSON-LD |
 | `à compléter` | ❌ SIRET, TVA, code APE, assurance décennale, hébergeur, médiateur |
 
 Commande de remplacement pour les deux premiers (adapter les valeurs) :
 
 ```bash
-grep -rl 'vr-couverture\.fr' . --include='*.html' --include='*.js' | xargs sed -i '' \
-  -e 's/contact@vr-couverture\.fr/vraie@adresse.fr/g' \
-  -e 's/vr-couverture\.fr/vrai-domaine.fr/g'
+# adresse de réception du formulaire
+grep -rl 'contact@vr-couverture\.fr' . --include='*.html' --include='*.js' \
+  | xargs sed -i '' 's/contact@vr-couverture\.fr/vraie@adresse.fr/g'
 ```
+
+### Passage au domaine définitif
+
+```bash
+# 1. basculer les URLs absolues (canonical, OG, sitemap, robots, JSON-LD)
+grep -rl 'znk-v.github.io/vr-couverture' . --include='*.html' --include='*.xml' --include='*.txt' \
+  | xargs sed -i '' 's|https://znk-v.github.io/vr-couverture/|https://vrai-domaine.fr/|g'
+# 2. déclarer le domaine à GitHub Pages
+echo "vrai-domaine.fr" > CNAME
+git add -A && git commit -m "Domaine vrai-domaine.fr" && git push
+```
+
+Côté registrar : un CNAME `www` vers `znk-v.github.io`, et pour l'apex les quatre
+A records GitHub (185.199.108/109/110/111.153).
 
 Vérifier ensuite `grep -rn "à compléter" .`
 
